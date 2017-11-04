@@ -1,7 +1,12 @@
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <unistd.h> // for fork(), execv()
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "commands.h"
 #include "built_in.h"
@@ -33,7 +38,7 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
   if (n_commands > 0) {
     struct single_command* com = (*commands);
 
-    assert(com->argc != 0);
+    assert(com->argc != 0); // if com->argc == 0, exit
 
     int built_in_pos = is_built_in_command(com->argv[0]);
     if (built_in_pos != -1) {
@@ -50,11 +55,24 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
     } else if (strcmp(com->argv[0], "exit") == 0) {
       return 1;
     } else {
-      fprintf(stderr, "%s: command not found\n", com->argv[0]);
-      return -1;
+
+	pid_t child_pid;
+	int child_status;
+
+	child_pid = fork();
+
+	if (child_pid == 0) {
+
+	    execv(com->argv[0], com->argv);
+	    fprintf(stderr, "%s: command not found\n", com->argv[0]);
+	    exit(0);	
+	}
+	else {
+		wait(&child_status);
+		return 0;
+	}
     }
   }
-
   return 0;
 }
 
