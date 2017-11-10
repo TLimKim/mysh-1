@@ -27,8 +27,10 @@ int do_pwd(int argc, char** argv) {
   if (getcwd(curdir, PATH_MAX) == NULL)
     return -1;
 
+  fflush(stdout);
   printf("%s\n", curdir);
 
+  fflush(stdout);
   return 0;
 }
 
