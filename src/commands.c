@@ -89,7 +89,7 @@ void* client_thread(void* threadData) {
     }
     //printf("Connected Clear \n");
     
-    sleep(1);
+    //sleep(1);
 
     int temp = dup(STDOUT_FILENO); // Store OG FD
     
