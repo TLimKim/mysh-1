@@ -119,7 +119,7 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
 	      return -1;
 	    }    
 	    return 0;
-	  } else {
+	    } else {
 	    fprintf(stderr, "%s: Invalid arguments\n", com->argv[0]);
 	    return -1;
 	  }
@@ -232,7 +232,6 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
       dup2(temp, STDIN_FILENO);
       close(s_sock);
       close(c_sock);
-      
       return 0;
   }
 }
