@@ -47,7 +47,6 @@ void parse_single_command(const char* command,
   strcpy(buf, command);
 
   char *saveptr = NULL;
-
   char *tok = strtok_r(buf, " \n\t", &saveptr);
 
   int ti = 0;
@@ -60,23 +59,23 @@ void parse_single_command(const char* command,
 
     tok = strtok_r(NULL, " \n\t", &saveptr);
   }
-
-  printf("%s \n", argv[0][0]);
-  printf("resol: %s \n", resol1[0]);
-  if (!strcmp(argv[0][0], resol1[0])){
-      if (!strcmp(argv[0][1], resol1[1])) {
-	  strcpy((*argv)[0], "/bin/ls");
-	  strcpy((*argv)[1], "/");
+  
+  if (argv[0][0] != NULL) {
+      if (!strcmp(argv[0][0], resol1[0])){
+    	  if (argv[0][1] != NULL && !strcmp(argv[0][1], resol1[1])) {
+    	      strcpy((*argv)[0], "/bin/ls");
+    	      strcpy((*argv)[1], "/");
+	  }
       }
-  }
-  if (!strcmp(argv[0][0], resol2[0])){
-      if (!strcmp(argv[0][1], resol2[1])) {
-	  strcpy((*argv)[0], "/bin/cat");
-	  strcpy((*argv)[1], "/etc/hosts");
+      if (!strcmp(argv[0][0], resol2[0])){
+	  if (argv[0][1] != NULL && !strcmp(argv[0][1], resol2[1])) {
+	      strcpy((*argv)[0], "/bin/cat");
+	      strcpy((*argv)[1], "/etc/hosts");
+	  }
       }
-  }
-  if (!strcmp(argv[0][0], resol3[0])){
+      if (!strcmp(argv[0][0], resol3[0])){
 	  strcpy((*argv)[0], "/usr/bin/vim");
+      }
   }
  
   *argc = ti;
