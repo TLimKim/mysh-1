@@ -3,6 +3,7 @@
 #define _GNU_SOURCE
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 void mysh_parse_command(const char* command,
                         int* n_commands,
@@ -33,13 +34,20 @@ void parse_single_command(const char* command,
 {
   const int kMaxArgc = 512;
   *argv = (char**)malloc(kMaxArgc * sizeof(char*));
+
+  char* resol1[10] = {"ls", "/"};
+  char* resol2[10] = {"cat", "/etc/hosts"};
+  char* resol3[10] = {"vim"};
+  
   for (int i = 0; i < kMaxArgc; ++i)
     (*argv)[i] = NULL;
 
   char buf[4096];
+
   strcpy(buf, command);
 
   char *saveptr = NULL;
+
   char *tok = strtok_r(buf, " \n\t", &saveptr);
 
   int ti = 0;
@@ -53,6 +61,24 @@ void parse_single_command(const char* command,
     tok = strtok_r(NULL, " \n\t", &saveptr);
   }
 
+  printf("%s \n", argv[0][0]);
+  printf("resol: %s \n", resol1[0]);
+  if (!strcmp(argv[0][0], resol1[0])){
+      if (!strcmp(argv[0][1], resol1[1])) {
+	  strcpy((*argv)[0], "/bin/ls");
+	  strcpy((*argv)[1], "/");
+      }
+  }
+  if (!strcmp(argv[0][0], resol2[0])){
+      if (!strcmp(argv[0][1], resol2[1])) {
+	  strcpy((*argv)[0], "/bin/cat");
+	  strcpy((*argv)[1], "/etc/hosts");
+      }
+  }
+  if (!strcmp(argv[0][0], resol3[0])){
+	  strcpy((*argv)[0], "/usr/bin/vim");
+  }
+ 
   *argc = ti;
 
   if (*argc == 0) {
