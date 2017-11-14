@@ -35,7 +35,7 @@ void parse_single_command(const char* command,
   const int kMaxArgc = 512;
   *argv = (char**)malloc(kMaxArgc * sizeof(char*));
 
-  char* resol1[10] = {"ls", "/"};
+  char* resol1[10] = {"ls", "/"}; // resol1 ~ 3 for Path Resolution
   char* resol2[10] = {"cat", "/etc/hosts"};
   char* resol3[10] = {"vim"};
   
@@ -60,6 +60,9 @@ void parse_single_command(const char* command,
     tok = strtok_r(NULL, " \n\t", &saveptr);
   }
   
+  /*
+  ** This if statement for Path Resolution
+  */
   if (argv[0][0] != NULL) {
       if (!strcmp(argv[0][0], resol1[0])){
     	  if (argv[0][1] != NULL && !strcmp(argv[0][1], resol1[1])) {
@@ -76,7 +79,7 @@ void parse_single_command(const char* command,
       if (!strcmp(argv[0][0], resol3[0])){
 	  strcpy((*argv)[0], "/usr/bin/vim");
       }
-  }
+  } // end Path Resolution
  
   *argc = ti;
 

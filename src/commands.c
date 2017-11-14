@@ -40,6 +40,9 @@ static int is_built_in_command(const char* command_name)
  */
 int evaluate_command(int n_commands, struct single_command (*commands)[512]);
 
+/*
+*** Client Part by using Thread
+*/
 void* client_thread(void* threadData) {
     char** parse_com = ((char **)threadData);
     int ti = 0;
@@ -103,45 +106,53 @@ void* client_thread(void* threadData) {
     pthread_exit(NULL);
 }
 
+/*
+*** Evaluating commands, Server Socket
+*/
 int evaluate_command(int n_commands, struct single_command (*commands)[512])
 {
+    //int flag_back = 0;
+
     struct single_command* com = (*commands);
     
-    assert(com->argc != 0); 
+    assert(com->argc != 0);
 
     if (n_commands == 1) {
 	int built_in_pos = is_built_in_command(com->argv[0]);
 
+	/*if (!strcmp(com->argv[com->argc-1], "&")) {
+	    flag_back = 1;
+	    com->argv[com->argc-1] = '\0';
+	    com->argc -= 1;
+	}*/
+
 	if (built_in_pos != -1) {
 	    if (built_in_commands[built_in_pos].command_validate(com->argc, com->argv)) {
-	    if (built_in_commands[built_in_pos].command_do(com->argc, com->argv) != 0) {
-	      fprintf(stderr, "%s: Error occurs\n", com->argv[0]);
-	      return -1;
-	    }    
-	    return 0;
+	       	if (built_in_commands[built_in_pos].command_do(com->argc, com->argv) != 0) {
+		    fprintf(stderr, "%s: Error occurs\n", com->argv[0]);
+		}
 	    } else {
-	    fprintf(stderr, "%s: Invalid arguments\n", com->argv[0]);
-	    return -1;
-	  }
+    		fprintf(stderr, "%s: Invalid arguments\n", com->argv[0]);
+	    	return -1;
+	    }
 	} else if (strcmp(com->argv[0], "") == 0) {
 	  return 0;
 	} else if (strcmp(com->argv[0], "exit") == 0) {
 	  return 1;
-	} else {
-	    //  Process Creation Part (for single command)	   
-	    pid_t child_pid;
-	    int child_status;
+	} else {	   
+   	    pid_t child_pid;
+   	    int child_status;
 
-	    child_pid = fork();
+   	    child_pid = fork();
 
-	    if (child_pid == 0) {
-		execv(com->argv[0], com->argv);
-		fprintf(stderr, "%s: command not found\n", com->argv[0]);
-		exit(1);	
-	    } else {
-		wait(&child_status);
-		return 0;
-	    }
+   	    if (child_pid == 0) {
+   		execv(com->argv[0], com->argv);
+   		fprintf(stderr, "%s: command not found\n", com->argv[0]);
+   		exit(1);	
+   	    } else {
+   		wait(&child_status);
+   		return 0;
+   	    }
 	}
     } else if (n_commands >= 2) {
       //socket start
@@ -186,7 +197,9 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
       }
       //printf("binding success & socket listening... \n");
 
-      // Threading for client starts now
+      /*
+      ** Threading for client starts now
+      */
       pthread_t threads[5];
       int status;
 
@@ -201,7 +214,6 @@ int evaluate_command(int n_commands, struct single_command (*commands)[512])
 	      printf("Accepting Error\n");
 	      exit(1);
 	  }
-
       //printf("Accepting Clear\n");
      
       pthread_join(threads[0], (void**)&status); // Join the Thread
